@@ -12,11 +12,12 @@ var RisingTower = window.RisingTower = function() {
   self.modules  = [];
 
   // Initialize all modules
+  self.load('Room');
+  self.load('World');
   self.load('Person');
+  self.load('Viewport');
   self.load('Environment');
   self.load('UserInterface');
-  self.load('Viewport');
-  self.load('World');
 
   self.onload(function() {
     self.game = new Phaser.Game(800, 600, Phaser.WEBGL, '', {
