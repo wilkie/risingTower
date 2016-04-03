@@ -157,6 +157,7 @@ RisingTower.prototype.create = function() {
   RisingTower.world = new RisingTower.World();
   RisingTower.viewport = new RisingTower.Viewport(
     0, 0, 800, 600, RisingTower.world);
+  RisingTower.viewport.bottomAt(64);
   RisingTower.UserInterface.addViewport(RisingTower.viewport);
 
   //var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
