@@ -16,6 +16,7 @@ var RisingTower = window.RisingTower = function() {
   self.load('World');
   self.load('Person');
   self.load('Viewport');
+  self.load('Elevator');
   self.load('Environment');
   self.load('UserInterface');
 
