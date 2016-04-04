@@ -168,7 +168,9 @@ RisingTower.prototype.loadMod = function(name) {
  */
 RisingTower.prototype.preload = function() {
   var game = this.game;
-  game.load.image('logo', 'phaser.png');
+
+  // Disable right mouse click menu
+  game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
 
   this.preloads.forEach(function(module) {
     var moduleInfo = module.module;
