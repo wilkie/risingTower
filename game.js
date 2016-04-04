@@ -26,7 +26,7 @@ var RisingTower = window.RisingTower = function() {
   self.load('Normal', 'Elevators');
 
   self.onload(function() {
-    self.game = new Phaser.Game(800, 600, Phaser.WEBGL, '', {
+    self.game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.WEBGL, '', {
       preload: function() {
         self.preload();
       },
@@ -188,7 +188,7 @@ RisingTower.prototype.create = function() {
   // Initialize game
   RisingTower.world = new RisingTower.World(game);
   RisingTower.viewport = new RisingTower.Viewport(
-    game, 0, 0, 800, 600, RisingTower.world);
+    game, 0, 0, game.width, game.height, RisingTower.world);
   RisingTower.viewport.bottomAt(64);
   RisingTower.UserInterface.addViewport(RisingTower.viewport);
 
