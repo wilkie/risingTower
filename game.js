@@ -21,6 +21,8 @@ var RisingTower = window.RisingTower = function() {
   self.load('Environment');
   self.load('UserInterface');
 
+  self.load('Office', 'Rooms');
+
   self.onload(function() {
     self.game = new Phaser.Game(800, 600, Phaser.WEBGL, '', {
       preload: function() {
@@ -51,6 +53,10 @@ RisingTower.prototype.onload = function(callback) {
   }
 };
 
+/* The collection of Rooms one can build.
+ */
+RisingTower.Rooms = {};
+
 /* This loads a javascript file given by url.
  */
 RisingTower.prototype.loadScript = function(url, onload) {
@@ -74,16 +80,39 @@ RisingTower.prototype.loadScript = function(url, onload) {
   head.insertBefore(script, head.firstChild);
 };
 
+/* Helper function to turn strings like "UserInterface" into "user_interface"
+ * which is used by our module loader.
+ */
+RisingTower.underscore = function(name) {
+  return name.replace(/.[A-Z]/g, function(m){
+    return m[0] + "_" + m[1].toLowerCase();}).toLowerCase();
+};
+
 /* This loads a module.
  */
-RisingTower.prototype.load = function(name) {
+RisingTower.prototype.load = function(name, root) {
   var self = this;
+
+  var path = "";
+  var rootModule = RisingTower;
+  var type = "";
+
+  if (root === undefined) {
+    root = "";
+  }
+  else {
+    path = RisingTower.underscore(root);
+    type = path;
+    rootModule = rootModule[root];
+  }
+  if (path.length != 0) {
+    path = path + "/";
+  }
 
   // Create the path to the javascript file that implements the object.
   // First we turn the name ("UserInterface") into a filename ("user_interface")
-  var filename = name.replace(/.[A-Z]/g, function(m){
-    return m[0] + "_" + m[1].toLowerCase();}).toLowerCase();
-  var url = 'lib/' + filename + ".js";
+  var filename = RisingTower.underscore(name);
+  var url = 'lib/' + path + filename + ".js";
 
   // We will run initBlah and pass the RisingTower object. (where Blah is name)
   var initFunction = 'init' + name;
@@ -92,11 +121,13 @@ RisingTower.prototype.load = function(name) {
   this.loadScript(url, function() {
     var initModule = window[initFunction];
     if (initModule !== undefined) {
-      initModule(window.RisingTower);
+      initModule(rootModule);
 
-      var module = RisingTower[name];
+      var module = rootModule[name];
 
       if (module !== undefined) {
+        module.type = type;
+
         var moduleInfo = {
           'name': name,
           'object': module,
@@ -157,9 +188,9 @@ RisingTower.prototype.create = function() {
   var game = this.game;
 
   // Initialize game
-  RisingTower.world = new RisingTower.World();
+  RisingTower.world = new RisingTower.World(game);
   RisingTower.viewport = new RisingTower.Viewport(
-    0, 0, 800, 600, RisingTower.world);
+    game, 0, 0, 800, 600, RisingTower.world);
   RisingTower.viewport.bottomAt(64);
   RisingTower.UserInterface.addViewport(RisingTower.viewport);
 
