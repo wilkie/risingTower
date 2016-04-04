@@ -13,6 +13,7 @@ var RisingTower = window.RisingTower = function() {
 
   // Initialize all modules
   self.load('Room');
+  self.load('Floor');
   self.load('World');
   self.load('Person');
   self.load('Viewport');
