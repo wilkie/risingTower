@@ -23,6 +23,8 @@ var RisingTower = window.RisingTower = function() {
 
   self.load('Office', 'Rooms');
 
+  self.load('Normal', 'Elevators');
+
   self.onload(function() {
     self.game = new Phaser.Game(800, 600, Phaser.WEBGL, '', {
       preload: function() {
@@ -52,10 +54,6 @@ RisingTower.prototype.onload = function(callback) {
     }
   }
 };
-
-/* The collection of Rooms one can build.
- */
-RisingTower.Rooms = {};
 
 /* This loads a javascript file given by url.
  */
@@ -103,6 +101,9 @@ RisingTower.prototype.load = function(name, root) {
   else {
     path = RisingTower.underscore(root);
     type = path;
+    if (rootModule[root] === undefined) {
+      rootModule[root] = {};
+    }
     rootModule = rootModule[root];
   }
   if (path.length != 0) {
@@ -115,7 +116,7 @@ RisingTower.prototype.load = function(name, root) {
   var url = 'lib/' + path + filename + ".js";
 
   // We will run initBlah and pass the RisingTower object. (where Blah is name)
-  var initFunction = 'init' + name;
+  var initFunction = 'init' + root + name;
 
   // Load the script.
   this.loadScript(url, function() {
@@ -133,18 +134,22 @@ RisingTower.prototype.load = function(name, root) {
           'object': module,
         };
 
+        if ((root !== undefined) && (root.length > 0)) {
+          moduleInfo.root = root;
+        }
+
         // Append preloads, etc
         if (module.preload !== undefined) {
-          self.preloads.push({ 'object': module, 'name': name, 'callback': module.preload});
+          self.preloads.push({'module': moduleInfo, callback: module.preload});
         }
         if (module.create !== undefined) {
-          self.creates.push({ 'object': module, 'name': name, 'callback': module.create});
+          self.creates.push({'module': moduleInfo, callback: module.create});
         }
         if (module.update !== undefined) {
-          self.updates.push({ 'object': module, 'name': name, 'callback': module.update});
+          self.updates.push({'module': moduleInfo, callback: module.update});
         }
         if (module.render !== undefined) {
-          self.renders.push({ 'object': module, 'name': name, 'callback': module.render});
+          self.renders.push({'module': moduleInfo, callback: module.render});
         }
 
         // Append to our list of modules
@@ -157,16 +162,6 @@ RisingTower.prototype.load = function(name, root) {
 /* This loads a mod. Currently unimplemented.
  */
 RisingTower.prototype.loadMod = function(name) {
-  // Create the path to the javascript file that implements the object.
-  var url = 'mods/' + name.toLowerCase() + ".js";
-
-  // We will run initBlah and pass the RisingTower object. (where Blah is name)
-  var evalString = 'init' + name + '(window.RisingTower.Mods)';
-
-  // Load the script.
-  this.loadScript(url, function() {
-    eval(evalString);
-  });
 };
 
 /* This is called by Phaser to tell us to load resources.
@@ -176,8 +171,9 @@ RisingTower.prototype.preload = function() {
   game.load.image('logo', 'phaser.png');
 
   this.preloads.forEach(function(module) {
-    console.log("Preloading " + module.name);
-    module.callback.call(module.object, game);
+    var moduleInfo = module.module;
+    console.log("Preloading " + (moduleInfo.root !== undefined ? moduleInfo.root + ": " : "") + moduleInfo.name);
+    module.callback.call(moduleInfo.object, game);
   });
 };
 
@@ -198,8 +194,9 @@ RisingTower.prototype.create = function() {
   //logo.anchor.setTo(0.5, 0.5);
 
   this.creates.forEach(function(module) {
-    console.log("Creating " + module.name);
-    module.callback.call(module.object, game);
+    var moduleInfo = module.module;
+    console.log("Creating " + (moduleInfo.root !== undefined ? moduleInfo.root + ": " : "") + moduleInfo.name);
+    module.callback.call(moduleInfo.object, game);
   });
 };
 
@@ -209,7 +206,8 @@ RisingTower.prototype.update = function() {
   var game = this.game;
 
   this.updates.forEach(function(module) {
-    module.callback.call(module.object, game);
+    var moduleInfo = module.module;
+    module.callback.call(moduleInfo.object, game);
   });
 };
 
@@ -220,6 +218,7 @@ RisingTower.prototype.render = function() {
   var game = this.game;
 
   this.renders.forEach(function(module) {
-    module.callback.call(module.object, game);
+    var moduleInfo = module.module;
+    module.callback.call(moduleInfo.object, game);
   });
 };
