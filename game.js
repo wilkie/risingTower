@@ -21,6 +21,8 @@ var RisingTower = window.RisingTower = function() {
   self.load('Environment');
   self.load('UserInterface');
 
+  self.load('Window', 'UI');
+
   self.load('Office', 'Rooms');
 
   self.load('Normal', 'Elevators');
@@ -82,7 +84,7 @@ RisingTower.prototype.loadScript = function(url, onload) {
  * which is used by our module loader.
  */
 RisingTower.underscore = function(name) {
-  return name.replace(/.[A-Z]/g, function(m){
+  return name.replace(/[a-z][A-Z]/g, function(m){
     return m[0] + "_" + m[1].toLowerCase();}).toLowerCase();
 };
 
