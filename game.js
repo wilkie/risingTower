@@ -16,12 +16,12 @@ var RisingTower = window.RisingTower = function() {
   self.load('Floor');
   self.load('World');
   self.load('Person');
-  self.load('Viewport');
   self.load('Elevator');
   self.load('Environment');
-  self.load('UserInterface');
 
-  self.load('Window', 'UI');
+  self.load('Screen',   'UI');
+  self.load('Window',   'UI');
+  self.load('Viewport', 'UI');
 
   self.load('Office', 'Rooms');
 
@@ -189,20 +189,20 @@ RisingTower.prototype.create = function() {
 
   // Initialize game
   RisingTower.world = new RisingTower.World(game);
-  RisingTower.viewport = new RisingTower.Viewport(
+  RisingTower.screen = new RisingTower.UI.Screen(game, 0, 0, game.width, game.height);
+  var w = new RisingTower.UI.Window(game, 0, 0, game.width, game.height, RisingTower.UI.Window.Style.Borderless);
+  RisingTower.screen.add(w);
+
+  RisingTower.viewport = new RisingTower.UI.Viewport(
     game, 0, 0, game.width, game.height, RisingTower.world);
   RisingTower.viewport.bottomAt(64);
-  RisingTower.UserInterface.addViewport(RisingTower.viewport);
+  w.add(RisingTower.viewport);
 
-  this._window = new RisingTower.UI.Window(game, 100, 100, 300, 300);
-  var windowVP = new RisingTower.Viewport(game, 100, 120, 300, 280, RisingTower.world);
-  this._window.add(windowVP);
-  windowVP.bottomAt(64);
-  game.world.add(RisingTower.viewport.group());
-  game.world.add(this._window.group());
-
-  //var logo = game.add.sprite(game.world.centerX, game.world.centerY, 'logo');
-  //logo.anchor.setTo(0.5, 0.5);
+  var w2 = new RisingTower.UI.Window(game, 100, 100, 300, 300, RisingTower.UI.Window.Style.Bordered);
+  w.add(w2);
+  var v2 = new RisingTower.UI.Viewport(game, 0, 20, 300, 280, RisingTower.world);
+  v2.bottomAt(64);
+  w2.add(v2);
 
   this.creates.forEach(function(module) {
     var moduleInfo = module.module;
